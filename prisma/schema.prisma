@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// 用户模型 - User
+// ============================================
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  phone     String?  @unique
+  password  String
+  nickname  String
+  avatar    String?
+  role      UserRole @default(USER)
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关联关系
+  doctorProfile Doctor?
+  posts         Post[]
+  orders        Order[]
+
+  @@index([email])
+  @@index([phone])
+  @@index([createdAt])
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  DOCTOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
+// ============================================
+// 医生模型 - Doctor
+// ============================================
+model Doctor {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  title         String   // 职称
+  hospital      String   // 医院
+  department    String   // 科室
+  specialty     String   // 专长
+  experience    Int      // 从业年限
+  certification String?  // 认证信息
+  bio           String?  @db.Text
+  isVerified    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 关联关系
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isVerified])
+  @@map("doctors")
+}
+
+// ============================================
+// 帖子模型 - Post
+// ============================================
+model Post {
+  id         String     @id @default(cuid())
+  authorId   String
+  title      String
+  content    String     @db.Text
+  category   String?
+  tags       String?    // JSON array stored as string
+  viewCount  Int        @default(0)
+  likeCount  Int        @default(0)
+  status     PostStatus @default(PUBLISHED)
+  publishedAt DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  // 关联关系
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([createdAt])
+  @@map("posts")
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  DELETED
+}
+
+// ============================================
+// 订单模型 - Order
+// ============================================
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  orderNo     String      @unique
+  productType String      // 产品类型：COURSE, CONSULTATION, MEMBERSHIP
+  productId   String      // 产品ID
+  productName String      // 产品名称
+  amount      Decimal     @db.Decimal(10, 2)
+  status      OrderStatus @default(PENDING)
+  paidAt      DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // 关联关系
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([orderNo])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  REFUNDED
+}
