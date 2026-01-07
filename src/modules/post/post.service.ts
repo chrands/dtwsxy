@@ -27,28 +27,39 @@ export class PostService {
     // 确定发布时间：只有状态为 PUBLISHED 时才设置发布时间
     const publishedAt = status === 'PUBLISHED' ? new Date() : null;
 
-    const post = await prisma.post.create({
-      data: {
-        ...rest,
-        status, // 显式设置状态
-        tags: tags ? JSON.stringify(tags) : null,
-        publishedAt,
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            nickname: true,
-            avatar: true,
+    try {
+      const post = await prisma.post.create({
+        data: {
+          ...rest,
+          status, // 显式设置状态
+          tags: tags ? JSON.stringify(tags) : null,
+          publishedAt,
+        },
+        include: {
+          author: {
+            select: {
+              id: true,
+              nickname: true,
+              avatar: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    return {
-      ...post,
-      tags: post.tags ? JSON.parse(post.tags) : [],
-    };
+      return {
+        ...post,
+        tags: post.tags ? JSON.parse(post.tags) : [],
+      };
+    } catch (error: any) {
+      // 捕获 Prisma 外键约束错误并转换为 NotFoundError
+      if (error?.code === 'P2003') {
+        const fieldName = error.meta?.field_name || '';
+        if (fieldName.includes('authorId') || fieldName.includes('author')) {
+          throw new NotFoundError('作者不存在');
+        }
+      }
+      throw error;
+    }
   }
 
   /**
@@ -169,7 +180,7 @@ export class PostService {
       },
     });
 
-    const items = posts.map((post) => ({
+    const items = posts.map((post: typeof posts[0]) => ({
       ...post,
       tags: post.tags ? JSON.parse(post.tags) : [],
     }));

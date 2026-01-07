@@ -38,16 +38,32 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(params.password, 10);
 
     // 创建用户
-    const user = await prisma.user.create({
-      data: {
-        ...params,
-        password: hashedPassword,
-      },
-    });
+    try {
+      const user = await prisma.user.create({
+        data: {
+          ...params,
+          password: hashedPassword,
+        },
+      });
 
-    // 移除密码字段
-    const { password, ...publicUser } = user;
-    return publicUser;
+      // 移除密码字段
+      const { password, ...publicUser } = user;
+      return publicUser;
+    } catch (error: any) {
+      // 捕获 Prisma 唯一约束错误并转换为 ConflictError
+      if (error?.code === 'P2002') {
+        const target = error.meta?.target || [];
+        if (Array.isArray(target) && target.some((t: string) => t.includes('email') || t === 'email')) {
+          throw new ConflictError('邮箱已被注册');
+        }
+        if (Array.isArray(target) && target.some((t: string) => t.includes('phone') || t === 'phone')) {
+          throw new ConflictError('手机号已被注册');
+        }
+        // 如果无法确定具体字段，抛出通用冲突错误
+        throw new ConflictError('数据冲突，请检查邮箱或手机号是否已被使用');
+      }
+      throw error;
+    }
   }
 
   /**
@@ -84,13 +100,29 @@ export class UserService {
       }
     }
 
-    const user = await prisma.user.update({
-      where: { id },
-      data: params,
-    });
+    try {
+      const user = await prisma.user.update({
+        where: { id },
+        data: params,
+      });
 
-    const { password, ...publicUser } = user;
-    return publicUser;
+      const { password, ...publicUser } = user;
+      return publicUser;
+    } catch (error: any) {
+      // 捕获 Prisma 唯一约束错误并转换为 ConflictError
+      if (error?.code === 'P2002') {
+        const target = error.meta?.target || [];
+        if (Array.isArray(target) && target.some((t: string) => t.includes('phone') || t === 'phone')) {
+          throw new ConflictError('手机号已被其他用户使用');
+        }
+        if (Array.isArray(target) && target.some((t: string) => t.includes('email') || t === 'email')) {
+          throw new ConflictError('邮箱已被其他用户使用');
+        }
+        // 如果无法确定具体字段，抛出通用冲突错误
+        throw new ConflictError('数据冲突，请检查邮箱或手机号是否已被使用');
+      }
+      throw error;
+    }
   }
 
   /**
