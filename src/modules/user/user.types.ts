@@ -17,6 +17,10 @@ export interface CreateUserParams {
   hospital?: string;
   department?: string;
   title?: string;
+  specialty?: string;
+  experience?: number;
+  certification?: string;
+  bio?: string;
 }
 
 // 用户更新参数
