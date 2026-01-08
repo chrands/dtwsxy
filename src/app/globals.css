@@ -36,3 +36,11 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* 登录页背景纹理 */
+.bg-pattern {
+  background-color: #ffffff;
+  background-image: radial-gradient(#1499A8 0.5px, transparent 0.5px), radial-gradient(#1499A8 0.5px, #ffffff 0.5px);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+}
