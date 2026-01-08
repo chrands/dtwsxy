@@ -43,7 +43,7 @@ export const config = {
 
   // 文件上传配置
   upload: {
-    maxFileSize: 10 * 1024 * 1024 as const, // 10MB
+    maxFileSize: 10485760 as const, // 10MB (10 * 1024 * 1024)
     allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'] as const,
   },
 
@@ -62,7 +62,7 @@ export const config = {
     // 订单相关
     order: {
       orderNoPrefix: 'ORD' as const,
-      paymentTimeout: 30 * 60 * 1000 as const, // 30分钟
+      paymentTimeout: 1800000 as const, // 30分钟 (30 * 60 * 1000)
     },
   },
 };
