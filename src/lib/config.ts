@@ -3,6 +3,8 @@
  * 所有配置项必须在此文件中定义，不得分散在代码各处
  */
 
+import type { Secret, SignOptions } from 'jsonwebtoken';
+
 export const config = {
   // 应用基础配置
   app: {
@@ -19,8 +21,8 @@ export const config = {
 
   // JWT配置
   jwt: {
-    secret: (process.env.JWT_SECRET || 'default-secret-change-in-production') as string,
-    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string,
+    secret: (process.env.JWT_SECRET || 'default-secret-change-in-production') as Secret,
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as SignOptions['expiresIn'],
   },
 
   // 数据库配置
