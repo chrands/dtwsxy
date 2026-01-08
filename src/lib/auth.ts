@@ -3,7 +3,7 @@
  * 提供 token 生成、验证和用户认证功能
  */
 
-import jwt, { SignOptions } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { config } from './config';
 import { prisma } from './prisma';
 import { UnauthorizedError } from './errors';
@@ -39,10 +39,11 @@ export class AuthHelper {
    * 生成 JWT Token
    */
   static generateToken(payload: JwtPayload): string {
-    const options: SignOptions = {
-      expiresIn: config.jwt.expiresIn as string | number,
-    };
-    return jwt.sign(payload, config.jwt.secret, options);
+    // 使用类型断言解决 jsonwebtoken 类型定义问题
+    // @ts-expect-error - jsonwebtoken 类型定义中 expiresIn 的类型检查过于严格
+    return jwt.sign(payload, config.jwt.secret, {
+      expiresIn: config.jwt.expiresIn,
+    });
   }
 
   /**
