@@ -6,7 +6,7 @@
 export const config = {
   // 应用基础配置
   app: {
-    name: 'Dauteenvoice College',
+    name: 'Dauteenvoice College' as const,
     url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:5288',
     env: process.env.NODE_ENV || 'development',
   },
@@ -14,13 +14,13 @@ export const config = {
   // API配置
   api: {
     baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5288/api',
-    timeout: 30000, // 30秒
+    timeout: 30000 as const, // 30秒
   },
 
   // JWT配置
   jwt: {
-    secret: process.env.JWT_SECRET || 'default-secret-change-in-production',
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    secret: (process.env.JWT_SECRET || 'default-secret-change-in-production') as string,
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string,
   },
 
   // 数据库配置
@@ -41,29 +41,29 @@ export const config = {
 
   // 文件上传配置
   upload: {
-    maxFileSize: 10 * 1024 * 1024, // 10MB
-    allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+    maxFileSize: 10 * 1024 * 1024 as const, // 10MB
+    allowedTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'] as const,
   },
 
   // 业务配置
   business: {
     // 用户相关
     user: {
-      passwordMinLength: 6,
-      nicknameMaxLength: 50,
+      passwordMinLength: 6 as const,
+      nicknameMaxLength: 50 as const,
     },
     // 帖子相关
     post: {
-      titleMaxLength: 200,
-      contentMaxLength: 50000,
+      titleMaxLength: 200 as const,
+      contentMaxLength: 50000 as const,
     },
     // 订单相关
     order: {
-      orderNoPrefix: 'ORD',
-      paymentTimeout: 30 * 60 * 1000, // 30分钟
+      orderNoPrefix: 'ORD' as const,
+      paymentTimeout: 30 * 60 * 1000 as const, // 30分钟
     },
   },
-} as const;
+};
 
 // 配置验证
 export function validateConfig() {
