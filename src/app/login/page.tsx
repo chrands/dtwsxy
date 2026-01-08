@@ -261,6 +261,7 @@ export default function LoginPage() {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               placeholder={mode === 'register' ? '6-20位字符' : '请输入密码'}
+              autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
               className="w-full px-4 py-3 bg-gray-50 rounded-lg border border-gray-100 focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all text-sm"
               required
             />
