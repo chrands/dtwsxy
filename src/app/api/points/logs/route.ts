@@ -29,8 +29,10 @@ export async function GET(request: NextRequest) {
     const validatedParams = await Validator.validateQuery(queryLogsSchema, queryParams);
 
     const result = await PointsService.queryPointsLogs({
-      ...validatedParams,
+      page: validatedParams.page ?? 1,
+      pageSize: validatedParams.pageSize ?? 20,
       userId: payload.userId,
+      type: validatedParams.type,
     });
 
     return ResponseHelper.successWithPagination(result.items, {

@@ -37,7 +37,12 @@ export async function GET(request: NextRequest) {
 
     const validatedParams = await Validator.validateQuery(queryDoctorsSchema, queryParams);
 
-    const result = await DoctorService.queryDoctors(validatedParams);
+    const result = await DoctorService.queryDoctors({
+      page: validatedParams.page ?? 1,
+      pageSize: validatedParams.pageSize ?? 20,
+      isVerified: validatedParams.isVerified,
+      keyword: validatedParams.keyword,
+    });
 
     return ResponseHelper.successWithPagination(result.items, {
       page: result.page,

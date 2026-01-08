@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
 
     const result = await CourseService.getWatchHistory(
       payload.userId,
-      validatedQuery.page,
-      validatedQuery.pageSize
+      validatedQuery.page ?? 1,
+      validatedQuery.pageSize ?? 20
     );
 
     return ResponseHelper.successWithPagination(result.items, {

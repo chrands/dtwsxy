@@ -25,7 +25,12 @@ export async function GET(request: NextRequest) {
 
     const validatedParams = await Validator.validateQuery(queryExpertsSchema, queryParams);
 
-    const result = await ExpertService.queryExperts(validatedParams);
+    const result = await ExpertService.queryExperts({
+      page: validatedParams.page ?? 1,
+      pageSize: validatedParams.pageSize ?? 20,
+      isFeatured: validatedParams.isFeatured,
+      keyword: validatedParams.keyword,
+    });
 
     return ResponseHelper.successWithPagination(result.items, {
       page: result.page,

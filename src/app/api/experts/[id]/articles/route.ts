@@ -45,8 +45,8 @@ export async function GET(
 
     const result = await ExpertService.getExpertArticles(
       expert.doctorId,
-      validatedQuery.page,
-      validatedQuery.pageSize
+      validatedQuery.page ?? 1,
+      validatedQuery.pageSize ?? 20
     );
 
     return ResponseHelper.successWithPagination(result.items, {

@@ -33,7 +33,13 @@ export async function GET(request: NextRequest) {
 
     const validatedParams = await Validator.validateQuery(queryUsersSchema, queryParams);
 
-    const result = await UserService.queryUsers(validatedParams);
+    const result = await UserService.queryUsers({
+      page: validatedParams.page ?? 1,
+      pageSize: validatedParams.pageSize ?? 20,
+      role: validatedParams.role,
+      status: validatedParams.status,
+      keyword: validatedParams.keyword,
+    });
 
     return ResponseHelper.successWithPagination(result.items, {
       page: result.page,

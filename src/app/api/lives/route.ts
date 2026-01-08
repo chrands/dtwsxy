@@ -26,7 +26,12 @@ export async function GET(request: NextRequest) {
 
     const validatedParams = await Validator.validateQuery(queryLivesSchema, queryParams);
 
-    const result = await LiveService.queryLives(validatedParams);
+    const result = await LiveService.queryLives({
+      page: validatedParams.page ?? 1,
+      pageSize: validatedParams.pageSize ?? 20,
+      status: validatedParams.status,
+      keyword: validatedParams.keyword,
+    });
 
     return ResponseHelper.successWithPagination(result.items, {
       page: result.page,
