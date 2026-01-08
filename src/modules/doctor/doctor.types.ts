@@ -25,6 +25,7 @@ export interface UpdateDoctorParams {
   experience?: number;
   certification?: string;
   bio?: string;
+  isVerified?: boolean;
 }
 
 // 医生查询参数

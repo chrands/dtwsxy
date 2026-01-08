@@ -8,6 +8,7 @@ import { NotFoundError, BusinessError } from '@/lib/errors';
 import { config } from '@/lib/config';
 import type { CreateOrderParams, QueryOrdersParams, OrderDetail } from './order.types';
 import type { PaginatedResult } from '@/types';
+import { Prisma } from '@prisma/client';
 
 export class OrderService {
   /**
@@ -59,16 +60,24 @@ export class OrderService {
           });
 
           return newOrder;
-        } catch (error: any) {
+        } catch (error) {
           // 如果是唯一约束冲突（订单号重复），重试
-          if (error.code === 'P2002' && error.meta?.target?.includes('orderNo')) {
-            attempts++;
-            if (attempts >= maxAttempts) {
-              throw new BusinessError('订单号生成失败，请重试');
+          if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+            const target = error.meta?.['target'];
+            const targetFields = Array.isArray(target)
+              ? target.filter((item): item is string => typeof item === 'string')
+              : typeof target === 'string'
+                ? [target]
+                : [];
+            if (targetFields.includes('orderNo')) {
+              attempts++;
+              if (attempts >= maxAttempts) {
+                throw new BusinessError('订单号生成失败，请重试');
+              }
+              // 等待随机时间后重试，避免并发冲突
+              await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
+              continue;
             }
-            // 等待随机时间后重试，避免并发冲突
-            await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
-            continue;
           }
           // 其他错误直接抛出
           throw error;
@@ -136,7 +145,7 @@ export class OrderService {
     const { page, pageSize, userId, status, productType } = params;
     const skip = (page - 1) * pageSize;
 
-    const where: any = {};
+    const where: Prisma.OrderWhereInput = {};
     
     if (userId) {
       where.userId = userId;

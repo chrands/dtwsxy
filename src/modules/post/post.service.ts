@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { NotFoundError } from '@/lib/errors';
 import type { CreatePostParams, UpdatePostParams, QueryPostsParams, PostDetail } from './post.types';
 import type { PaginatedResult } from '@/types';
+import { Prisma } from '@prisma/client';
 
 export class PostService {
   /**
@@ -50,10 +51,10 @@ export class PostService {
         ...post,
         tags: post.tags ? JSON.parse(post.tags) : [],
       };
-    } catch (error: any) {
+    } catch (error) {
       // 捕获 Prisma 外键约束错误并转换为 NotFoundError
-      if (error?.code === 'P2003') {
-        const fieldName = error.meta?.field_name || '';
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        const fieldName = typeof error.meta?.['field_name'] === 'string' ? error.meta['field_name'] : '';
         if (fieldName.includes('authorId') || fieldName.includes('author')) {
           throw new NotFoundError('作者不存在');
         }
@@ -96,7 +97,7 @@ export class PostService {
     const existingPost = await this.getPostById(id);
 
     const { tags, status, ...rest } = params;
-    const updateData: any = { ...rest };
+    const updateData: Prisma.PostUpdateInput = { ...rest };
 
     if (tags) {
       updateData.tags = JSON.stringify(tags);
@@ -139,7 +140,7 @@ export class PostService {
     const { page, pageSize, authorId, category, status, keyword } = params;
     const skip = (page - 1) * pageSize;
 
-    const where: any = {};
+    const where: Prisma.PostWhereInput = {};
     
     if (authorId) {
       where.authorId = authorId;

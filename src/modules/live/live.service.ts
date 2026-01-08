@@ -13,7 +13,7 @@ import type {
   RecordWatchParams,
 } from './live.types';
 import type { PaginatedResult } from '@/types';
-import { LiveStatus, PointsType } from '@prisma/client';
+import { LiveStatus, PointsType, Prisma } from '@prisma/client';
 import { PointsService } from '../points/points.service';
 
 export class LiveService {
@@ -95,7 +95,7 @@ export class LiveService {
     const { page, pageSize, status, keyword } = params;
     const skip = (page - 1) * pageSize;
 
-    const where: any = {};
+    const where: Prisma.LiveWhereInput = {};
 
     if (status) {
       where.status = status;
@@ -118,7 +118,7 @@ export class LiveService {
     });
 
     return {
-      items: lives as LiveDetail[],
+      items: lives,
       page,
       pageSize,
       total,

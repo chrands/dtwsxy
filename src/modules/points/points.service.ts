@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { NotFoundError, BadRequestError, BusinessError } from '@/lib/errors';
 import type { CheckInParams, QueryPointsLogsParams, ExchangePointsParams } from './points.types';
 import type { PaginatedResult } from '@/types';
-import { PointsType } from '@prisma/client';
+import { PointsLog, PointsType, Prisma } from '@prisma/client';
 
 export class PointsService {
   /**
@@ -208,11 +208,11 @@ export class PointsService {
   /**
    * 查询积分流水
    */
-  static async queryPointsLogs(params: QueryPointsLogsParams): Promise<PaginatedResult<any>> {
+  static async queryPointsLogs(params: QueryPointsLogsParams): Promise<PaginatedResult<PointsLog>> {
     const { page, pageSize, userId, type } = params;
     const skip = (page - 1) * pageSize;
 
-    const where: any = { userId };
+    const where: Prisma.PointsLogWhereInput = { userId };
     if (type) {
       where.type = type;
     }

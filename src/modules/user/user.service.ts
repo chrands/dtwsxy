@@ -8,7 +8,19 @@ import { NotFoundError, ConflictError, BadRequestError } from '@/lib/errors';
 import type { CreateUserParams, UpdateUserParams, QueryUsersParams, PublicUser, VerifyMedicalParams } from './user.types';
 import type { PaginatedResult } from '@/types';
 import bcrypt from 'bcryptjs';
-import { UserType } from '@prisma/client';
+import { Prisma, UserType } from '@prisma/client';
+
+const getConstraintFields = (target: unknown): string[] => {
+  if (Array.isArray(target)) {
+    return target.filter((item): item is string => typeof item === 'string');
+  }
+
+  if (typeof target === 'string') {
+    return [target];
+  }
+
+  return [];
+};
 
 export class UserService {
   /**
@@ -83,14 +95,14 @@ export class UserService {
       // 移除密码字段
       const { password, ...publicUser } = user;
       return publicUser;
-    } catch (error: any) {
+    } catch (error) {
       // 捕获 Prisma 唯一约束错误并转换为 ConflictError
-      if (error?.code === 'P2002') {
-        const target = error.meta?.target || [];
-        if (Array.isArray(target) && target.some((t: string) => t.includes('email') || t === 'email')) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const targetFields = getConstraintFields(error.meta?.['target']);
+        if (targetFields.some((field) => field.includes('email') || field === 'email')) {
           throw new ConflictError('邮箱已被注册');
         }
-        if (Array.isArray(target) && target.some((t: string) => t.includes('phone') || t === 'phone')) {
+        if (targetFields.some((field) => field.includes('phone') || field === 'phone')) {
           throw new ConflictError('手机号已被注册');
         }
         // 如果无法确定具体字段，抛出通用冲突错误
@@ -189,14 +201,14 @@ export class UserService {
 
       const { password, ...publicUser } = user;
       return publicUser;
-    } catch (error: any) {
+    } catch (error) {
       // 捕获 Prisma 唯一约束错误并转换为 ConflictError
-      if (error?.code === 'P2002') {
-        const target = error.meta?.target || [];
-        if (Array.isArray(target) && target.some((t: string) => t.includes('phone') || t === 'phone')) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const targetFields = getConstraintFields(error.meta?.['target']);
+        if (targetFields.some((field) => field.includes('phone') || field === 'phone')) {
           throw new ConflictError('手机号已被其他用户使用');
         }
-        if (Array.isArray(target) && target.some((t: string) => t.includes('email') || t === 'email')) {
+        if (targetFields.some((field) => field.includes('email') || field === 'email')) {
           throw new ConflictError('邮箱已被其他用户使用');
         }
         // 如果无法确定具体字段，抛出通用冲突错误
@@ -214,7 +226,7 @@ export class UserService {
     const skip = (page - 1) * pageSize;
 
     // 构建查询条件
-    const where: any = {};
+    const where: Prisma.UserWhereInput = {};
     
     if (role) {
       where.role = role;

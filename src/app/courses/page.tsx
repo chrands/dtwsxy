@@ -3,9 +3,25 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+interface CourseListItem {
+  id: string;
+  title: string;
+  cover?: string | null;
+  author?: {
+    nickname: string;
+  } | null;
+  isFree?: boolean;
+  price?: string | number;
+}
+
+interface CategoryItem {
+  id: string;
+  name: string;
+}
+
 export default function CoursesPage() {
-  const [courses, setCourses] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [courses, setCourses] = useState<CourseListItem[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [loading, setLoading] = useState(true);
 
@@ -19,7 +35,7 @@ export default function CoursesPage() {
       const response = await fetch('/api/courses/categories');
       if (response.ok) {
         const data = await response.json();
-        setCategories(data.data || []);
+        setCategories(Array.isArray(data.data) ? data.data : []);
       }
     } catch (error) {
       console.error('获取分类失败', error);

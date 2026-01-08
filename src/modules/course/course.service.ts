@@ -16,7 +16,7 @@ import type {
   RecordWatchProgressParams,
 } from './course.types';
 import type { PaginatedResult } from '@/types';
-import { CourseStatus } from '@prisma/client';
+import { CourseStatus, Prisma } from '@prisma/client';
 import { PointsService } from '../points/points.service';
 
 export class CourseService {
@@ -138,7 +138,7 @@ export class CourseService {
     const { page, pageSize, categoryId, department, authorId, status, isFree, keyword, sortBy } = params;
     const skip = (page - 1) * pageSize;
 
-    const where: any = {};
+    const where: Prisma.CourseWhereInput = {};
 
     if (categoryId) {
       where.categoryId = categoryId;
@@ -178,7 +178,7 @@ export class CourseService {
     }
 
     // 排序
-    let orderBy: any = { createdAt: 'desc' };
+    let orderBy: Prisma.CourseOrderByWithRelationInput = { createdAt: 'desc' };
     if (sortBy === 'popular') {
       orderBy = { viewCount: 'desc' };
     } else if (sortBy === 'price') {
@@ -210,7 +210,7 @@ export class CourseService {
     });
 
     return {
-      items: courses as CourseListItem[],
+      items: courses,
       page,
       pageSize,
       total,

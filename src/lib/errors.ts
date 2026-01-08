@@ -8,7 +8,7 @@ export class AppError extends Error {
     public code: string,
     public message: string,
     public statusCode: number = 500,
-    public details?: any
+    public details?: unknown
   ) {
     super(message);
     this.name = 'AppError';
@@ -17,7 +17,7 @@ export class AppError extends Error {
 }
 
 export class ValidationError extends AppError {
-  constructor(message: string, details?: any) {
+  constructor(message: string, details?: unknown) {
     super('VALIDATION_ERROR', message, 400, details);
     this.name = 'ValidationError';
     Object.setPrototypeOf(this, ValidationError.prototype);

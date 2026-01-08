@@ -16,6 +16,24 @@ export interface JwtPayload {
   role: UserRole;
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const isUserRole = (value: unknown): value is UserRole =>
+  value === UserRole.USER || value === UserRole.DOCTOR || value === UserRole.ADMIN;
+
+const isJwtPayload = (value: unknown): value is JwtPayload => {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  const userId = value['userId'];
+  const email = value['email'];
+  const role = value['role'];
+
+  return typeof userId === 'string' && typeof email === 'string' && isUserRole(role);
+};
+
 export class AuthHelper {
   /**
    * 生成 JWT Token
@@ -31,8 +49,15 @@ export class AuthHelper {
    */
   static verifyToken(token: string): JwtPayload {
     try {
-      return jwt.verify(token, config.jwt.secret) as JwtPayload;
+      const decoded = jwt.verify(token, config.jwt.secret);
+      if (!isJwtPayload(decoded)) {
+        throw new UnauthorizedError('无效或过期的令牌');
+      }
+      return decoded;
     } catch (error) {
+      if (error instanceof UnauthorizedError) {
+        throw error;
+      }
       throw new UnauthorizedError('无效或过期的令牌');
     }
   }

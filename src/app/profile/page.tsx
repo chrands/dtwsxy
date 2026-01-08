@@ -4,10 +4,21 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+interface ProfileUser {
+  nickname?: string | null;
+  email?: string | null;
+  phone?: string | null;
+}
+
+interface UserPointsSummary {
+  availablePoints: number;
+  totalPoints: number;
+}
+
 export default function ProfilePage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
-  const [points, setPoints] = useState<any>(null);
+  const [user, setUser] = useState<ProfileUser | null>(null);
+  const [points, setPoints] = useState<UserPointsSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

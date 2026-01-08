@@ -78,8 +78,9 @@ export default function LoginPage() {
         localStorage.setItem('token', data.data.token);
         router.push('/');
       }
-    } catch (err: any) {
-      setError(err.message || '操作失败');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : '操作失败';
+      setError(message);
     } finally {
       setLoading(false);
     }

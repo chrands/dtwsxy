@@ -6,9 +6,11 @@ import { config } from './config';
  * 确保在开发环境下热重载不会创建多个数据库连接
  */
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+declare global {
+  var prisma: PrismaClient | undefined;
+}
+
+const globalForPrisma = globalThis;
 
 export const prisma =
   globalForPrisma.prisma ??

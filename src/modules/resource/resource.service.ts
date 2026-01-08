@@ -7,7 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { NotFoundError } from '@/lib/errors';
 import type { CreateResourceParams, QueryResourcesParams } from './resource.types';
 import type { PaginatedResult } from '@/types';
-import { ResourceStatus } from '@prisma/client';
+import { Prisma, Resource, ResourceStatus } from '@prisma/client';
 
 export class ResourceService {
   /**
@@ -61,7 +61,7 @@ export class ResourceService {
     const { page, pageSize, type, category, keyword } = params;
     const skip = (page - 1) * pageSize;
 
-    const where: any = {
+    const where: Prisma.ResourceWhereInput = {
       status: ResourceStatus.PUBLISHED,
     };
 

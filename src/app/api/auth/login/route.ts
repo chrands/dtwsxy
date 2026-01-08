@@ -10,6 +10,7 @@ import { prisma } from '@/lib/prisma';
 import { AppError, UnauthorizedError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const loginSchema = z.object({
@@ -30,15 +31,11 @@ export async function POST(request: NextRequest) {
     const isPhone = /^1[3-9]\d{9}$/.test(validatedData.account);
 
     // 构建查询条件
-    let where: any;
-    if (isEmail) {
-      where = { email: validatedData.account };
-    } else if (isPhone) {
-      where = { phone: validatedData.account };
-    } else {
-      // 用户名（字母、数字）
-      where = { nickname: validatedData.account };
-    }
+    const where: Prisma.UserWhereInput = isEmail
+      ? { email: validatedData.account }
+      : isPhone
+        ? { phone: validatedData.account }
+        : { nickname: validatedData.account };
 
     // 查找用户
     const user = await prisma.user.findFirst({

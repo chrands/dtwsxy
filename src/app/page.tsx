@@ -11,12 +11,27 @@ interface User {
   isMedicalVerified: boolean;
 }
 
+interface CourseListItem {
+  id: string;
+  title: string;
+  cover?: string | null;
+  author?: {
+    nickname: string;
+  } | null;
+}
+
+interface LiveListItem {
+  id: string;
+  title: string;
+  cover?: string | null;
+}
+
 export default function HomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [courses, setCourses] = useState<any[]>([]);
-  const [lives, setLives] = useState<any[]>([]);
+  const [courses, setCourses] = useState<CourseListItem[]>([]);
+  const [lives, setLives] = useState<LiveListItem[]>([]);
 
   useEffect(() => {
     // 检查登录状态

@@ -5,14 +5,14 @@ import { NextResponse } from 'next/server';
  * 所有API必须使用此模块返回响应
  */
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
   meta?: {
     page?: number;
@@ -66,7 +66,7 @@ export class ResponseHelper {
     message: string,
     code: string = 'UNKNOWN_ERROR',
     status: number = 500,
-    details?: any
+    details?: unknown
   ): NextResponse<ApiResponse> {
     return NextResponse.json(
       {
@@ -86,7 +86,7 @@ export class ResponseHelper {
    */
   static validationError(
     message: string = '参数验证失败',
-    details?: any
+    details?: unknown
   ): NextResponse<ApiResponse> {
     return this.error(message, 'VALIDATION_ERROR', 400, details);
   }
@@ -117,7 +117,7 @@ export class ResponseHelper {
    */
   static serverError(
     message: string = '服务器内部错误',
-    details?: any
+    details?: unknown
   ): NextResponse<ApiResponse> {
     return this.error(message, 'SERVER_ERROR', 500, details);
   }

@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { NotFoundError, ConflictError } from '@/lib/errors';
 import type { CreateDoctorParams, UpdateDoctorParams, QueryDoctorsParams, DoctorDetail } from './doctor.types';
 import type { PaginatedResult } from '@/types';
+import { Prisma } from '@prisma/client';
 
 export class DoctorService {
   /**
@@ -105,7 +106,7 @@ export class DoctorService {
     const { page, pageSize, isVerified, keyword } = params;
     const skip = (page - 1) * pageSize;
 
-    const where: any = {};
+    const where: Prisma.DoctorWhereInput = {};
     
     if (isVerified !== undefined) {
       where.isVerified = isVerified;

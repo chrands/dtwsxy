@@ -264,7 +264,7 @@ npx prisma studio
 
 
 # 构建生产版本
-
+npm run build
 
 # 构建成功后，会生成 .next 目录
 ```

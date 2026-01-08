@@ -17,7 +17,7 @@ const registerSchema = z.object({
   phone: CommonSchemas.phone.optional(),
   password: CommonSchemas.password,
   nickname: z.string().min(1, '昵称不能为空').max(50, '昵称最多50个字符'),
-  userType: z.enum(['MEDICAL_STAFF', 'NON_MEDICAL']).default('NON_MEDICAL'),
+  userType: z.nativeEnum(UserType).default(UserType.NON_MEDICAL),
   // 医护人员专属字段
   hospital: z.string().min(1, '医院不能为空').optional(),
   department: z.string().min(1, '科室不能为空').optional(),
@@ -34,7 +34,7 @@ const registerSchema = z.object({
   path: ['email'],
 }).refine((data) => {
   // 医护人员必须填写医院、科室、职称
-  if (data.userType === 'MEDICAL_STAFF') {
+  if (data.userType === UserType.MEDICAL_STAFF) {
     return data.hospital && data.department && data.title;
   }
   return true;
@@ -52,10 +52,7 @@ export async function POST(request: NextRequest) {
     const validatedData = await Validator.validateBody(registerSchema, body);
 
     // 创建用户
-    const user = await UserService.createUser({
-      ...validatedData,
-      userType: validatedData.userType as UserType,
-    });
+    const user = await UserService.createUser(validatedData);
 
     // 生成 Token
     const token = AuthHelper.generateToken({

@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { NotFoundError } from '@/lib/errors';
 import type { CreateExpertParams, QueryExpertsParams, ExpertDetail } from './expert.types';
 import type { PaginatedResult } from '@/types';
+import { Prisma } from '@prisma/client';
 
 export class ExpertService {
   /**
@@ -52,7 +53,7 @@ export class ExpertService {
       throw new NotFoundError('专家不存在');
     }
 
-    return expert as ExpertDetail;
+    return expert;
   }
 
   /**
@@ -62,7 +63,7 @@ export class ExpertService {
     const { page, pageSize, isFeatured, keyword } = params;
     const skip = (page - 1) * pageSize;
 
-    const where: any = {};
+    const where: Prisma.ExpertWhereInput = {};
 
     if (isFeatured !== undefined) {
       where.isFeatured = isFeatured;
@@ -117,7 +118,7 @@ export class ExpertService {
     });
 
     return {
-      items: experts as ExpertDetail[],
+      items: experts,
       page,
       pageSize,
       total,
