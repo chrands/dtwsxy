@@ -11,32 +11,32 @@ datasource db {
 // 用户模型 - User
 // ============================================
 model User {
-  id               String      @id @default(cuid())
-  email            String?     @unique
-  phone            String?      @unique
-  password         String
-  nickname         String
-  avatar           String?
-  role             UserRole     @default(USER)
-  status           UserStatus   @default(ACTIVE)
-  userType         UserType     @default(NON_MEDICAL) // 用户类型：医护人员/非医务人员
-  isMedicalVerified Boolean     @default(false) // 医护人员认证状态
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  id                String     @id @default(cuid())
+  email             String?    @unique
+  phone             String?    @unique
+  password          String
+  nickname          String
+  avatar            String?
+  role              UserRole   @default(USER)
+  status            UserStatus @default(ACTIVE)
+  userType          UserType   @default(NON_MEDICAL) // 用户类型：医护人员/非医务人员
+  isMedicalVerified Boolean    @default(false) // 医护人员认证状态
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   // 关联关系
-  doctorProfile    Doctor?
-  posts            Post[]
-  orders           Order[]
-  courses          Course[]     // 创建的课程
-  courseComments   CourseComment[]
-  courseLikes      CourseLike[]
-  courseFavorites  CourseFavorite[]
+  doctorProfile     Doctor?
+  posts             Post[]
+  orders            Order[]
+  courses           Course[] // 创建的课程
+  courseComments    CourseComment[]
+  courseLikes       CourseLike[]
+  courseFavorites   CourseFavorite[]
   videoWatchHistory VideoWatchHistory[]
-  liveWatchRecords LiveWatchRecord[]
-  userPoints       UserPoints?
-  pointsLogs       PointsLog[]
-  checkIns         CheckIn[]
+  liveWatchRecords  LiveWatchRecord[]
+  userPoints        UserPoints?
+  pointsLogs        PointsLog[]
+  checkIns          CheckIn[]
 
   @@index([email])
   @@index([phone])
@@ -47,8 +47,8 @@ model User {
 }
 
 enum UserType {
-  MEDICAL_STAFF  // 医护人员
-  NON_MEDICAL    // 非医务人员
+  MEDICAL_STAFF // 医护人员
+  NON_MEDICAL // 非医务人员
 }
 
 enum UserRole {
@@ -69,19 +69,19 @@ enum UserStatus {
 model Doctor {
   id            String   @id @default(cuid())
   userId        String   @unique
-  title         String   // 职称
-  hospital      String   // 医院
-  department    String   // 科室
-  specialty     String   // 专长
-  experience    Int      // 从业年限
-  certification String?  // 认证信息
+  title         String // 职称
+  hospital      String // 医院
+  department    String // 科室
+  specialty     String // 专长
+  experience    Int // 从业年限
+  certification String? // 认证信息
   bio           String?  @db.Text
   isVerified    Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   // 关联关系
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   expert Expert?
 
   @@index([userId])
@@ -93,18 +93,18 @@ model Doctor {
 // 帖子模型 - Post
 // ============================================
 model Post {
-  id         String     @id @default(cuid())
-  authorId   String
-  title      String
-  content    String     @db.Text
-  category   String?
-  tags       String?    // JSON array stored as string
-  viewCount  Int        @default(0)
-  likeCount  Int        @default(0)
-  status     PostStatus @default(PUBLISHED)
+  id          String     @id @default(cuid())
+  authorId    String
+  title       String
+  content     String     @db.Text
+  category    String?
+  tags        String? // JSON array stored as string
+  viewCount   Int        @default(0)
+  likeCount   Int        @default(0)
+  status      PostStatus @default(PUBLISHED)
   publishedAt DateTime?
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   // 关联关系
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
@@ -130,9 +130,9 @@ model Order {
   id          String      @id @default(cuid())
   userId      String
   orderNo     String      @unique
-  productType String      // 产品类型：COURSE, CONSULTATION, MEMBERSHIP
-  productId   String      // 产品ID
-  productName String      // 产品名称
+  productType String // 产品类型：COURSE, CONSULTATION, MEMBERSHIP
+  productId   String // 产品ID
+  productName String // 产品名称
   amount      Decimal     @db.Decimal(10, 2)
   status      OrderStatus @default(PENDING)
   paidAt      DateTime?
@@ -161,18 +161,18 @@ enum OrderStatus {
 // ============================================
 model Category {
   id          String   @id @default(cuid())
-  name        String   // 分类名称（如：皮肤美容缝合）
+  name        String // 分类名称（如：皮肤美容缝合）
   slug        String   @unique // URL友好标识
   description String?  @db.Text
-  parentId    String?  // 父分类ID（用于科室二级分类）
+  parentId    String? // 父分类ID（用于科室二级分类）
   sortOrder   Int      @default(0) // 排序
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // 关联关系
-  parent      Category?  @relation("CategoryTree", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryTree")
-  courses     Course[]
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  courses  Course[]
 
   @@index([parentId])
   @@index([slug])
@@ -183,32 +183,32 @@ model Category {
 // 课程模型 - Course
 // ============================================
 model Course {
-  id          String      @id @default(cuid())
-  title       String      // 课程标题
-  description String?     @db.Text // 课程描述
-  cover       String?     // 封面图片URL
-  categoryId  String      // 分类ID
-  authorId    String      // 讲师ID（关联User）
-  price       Decimal     @db.Decimal(10, 2) @default(0) // 价格
-  originalPrice Decimal?  @db.Decimal(10, 2) // 原价
-  isFree      Boolean     @default(false) // 是否免费
-  isVip       Boolean     @default(false) // 是否VIP课程
-  status      CourseStatus @default(DRAFT) // 状态
-  viewCount   Int         @default(0) // 观看次数
-  likeCount   Int         @default(0) // 点赞数
-  favoriteCount Int       @default(0) // 收藏数
-  commentCount Int        @default(0) // 评论数
-  publishedAt DateTime?   // 发布时间
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id            String       @id @default(cuid())
+  title         String // 课程标题
+  description   String?      @db.Text // 课程描述
+  cover         String? // 封面图片URL
+  categoryId    String // 分类ID
+  authorId      String // 讲师ID（关联User）
+  price         Decimal      @default(0) @db.Decimal(10, 2) // 价格
+  originalPrice Decimal?     @db.Decimal(10, 2) // 原价
+  isFree        Boolean      @default(false) // 是否免费
+  isVip         Boolean      @default(false) // 是否VIP课程
+  status        CourseStatus @default(DRAFT) // 状态
+  viewCount     Int          @default(0) // 观看次数
+  likeCount     Int          @default(0) // 点赞数
+  favoriteCount Int          @default(0) // 收藏数
+  commentCount  Int          @default(0) // 评论数
+  publishedAt   DateTime? // 发布时间
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
   // 关联关系
-  category    Category    @relation(fields: [categoryId], references: [id])
-  author      User        @relation(fields: [authorId], references: [id])
-  videos      CourseVideo[]
-  comments    CourseComment[]
-  likes       CourseLike[]
-  favorites   CourseFavorite[]
+  category     Category            @relation(fields: [categoryId], references: [id])
+  author       User                @relation(fields: [authorId], references: [id])
+  videos       CourseVideo[]
+  comments     CourseComment[]
+  likes        CourseLike[]
+  favorites    CourseFavorite[]
   watchHistory VideoWatchHistory[]
 
   @@index([categoryId])
@@ -220,9 +220,9 @@ model Course {
 }
 
 enum CourseStatus {
-  DRAFT      // 草稿
-  PUBLISHED  // 已发布
-  ARCHIVED   // 已归档
+  DRAFT // 草稿
+  PUBLISHED // 已发布
+  ARCHIVED // 已归档
 }
 
 // ============================================
@@ -230,17 +230,17 @@ enum CourseStatus {
 // ============================================
 model CourseVideo {
   id          String   @id @default(cuid())
-  courseId    String   // 课程ID
-  title       String   // 视频标题
+  courseId    String // 课程ID
+  title       String // 视频标题
   description String?  @db.Text
-  videoUrl    String   // 视频URL
+  videoUrl    String // 视频URL
   duration    Int      @default(0) // 时长（秒）
   sortOrder   Int      @default(0) // 排序
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // 关联关系
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course       Course              @relation(fields: [courseId], references: [id], onDelete: Cascade)
   watchHistory VideoWatchHistory[]
 
   @@index([courseId])
@@ -251,21 +251,21 @@ model CourseVideo {
 // 课程评论模型 - CourseComment
 // ============================================
 model CourseComment {
-  id          String   @id @default(cuid())
-  courseId    String   // 课程ID
-  userId      String   // 用户ID
-  content     String   @db.Text // 评论内容
-  parentId    String?  // 父评论ID（用于回复）
-  likeCount   Int      @default(0) // 点赞数
-  status      CommentStatus @default(PUBLISHED) // 状态
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String        @id @default(cuid())
+  courseId  String // 课程ID
+  userId    String // 用户ID
+  content   String        @db.Text // 评论内容
+  parentId  String? // 父评论ID（用于回复）
+  likeCount Int           @default(0) // 点赞数
+  status    CommentStatus @default(PUBLISHED) // 状态
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   // 关联关系
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parent      CourseComment? @relation("CommentReplies", fields: [parentId], references: [id])
-  replies     CourseComment[] @relation("CommentReplies")
+  course  Course          @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent  CourseComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies CourseComment[] @relation("CommentReplies")
 
   @@index([courseId])
   @@index([userId])
@@ -285,13 +285,13 @@ enum CommentStatus {
 // ============================================
 model CourseLike {
   id        String   @id @default(cuid())
-  courseId  String   // 课程ID
-  userId    String   // 用户ID
+  courseId  String // 课程ID
+  userId    String // 用户ID
   createdAt DateTime @default(now())
 
   // 关联关系
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([courseId, userId])
   @@index([courseId])
@@ -304,13 +304,13 @@ model CourseLike {
 // ============================================
 model CourseFavorite {
   id        String   @id @default(cuid())
-  courseId  String   // 课程ID
-  userId    String   // 用户ID
+  courseId  String // 课程ID
+  userId    String // 用户ID
   createdAt DateTime @default(now())
 
   // 关联关系
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([courseId, userId])
   @@index([courseId])
@@ -323,9 +323,9 @@ model CourseFavorite {
 // ============================================
 model VideoWatchHistory {
   id          String   @id @default(cuid())
-  courseId    String   // 课程ID
-  videoId     String?  // 视频ID（可选，用于记录具体视频）
-  userId      String   // 用户ID
+  courseId    String // 课程ID
+  videoId     String? // 视频ID（可选，用于记录具体视频）
+  userId      String // 用户ID
   watchTime   Int      @default(0) // 观看时长（秒）
   progress    Float    @default(0) // 观看进度（0-1）
   lastWatchAt DateTime @default(now()) // 最后观看时间
@@ -333,9 +333,9 @@ model VideoWatchHistory {
   updatedAt   DateTime @updatedAt
 
   // 关联关系
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  video       CourseVideo? @relation(fields: [videoId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  video  CourseVideo? @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([courseId, userId])
   @@index([userId])
@@ -349,13 +349,13 @@ model VideoWatchHistory {
 // ============================================
 model Live {
   id          String     @id @default(cuid())
-  title       String     // 直播标题
+  title       String // 直播标题
   description String?    @db.Text
-  cover       String?    // 封面图片
-  liveUrl     String?    // 第三方直播链接（有因直播/视频号）
+  cover       String? // 封面图片
+  liveUrl     String? // 第三方直播链接（有因直播/视频号）
   status      LiveStatus @default(UPCOMING) // 状态
-  startTime   DateTime   // 开始时间
-  endTime     DateTime?  // 结束时间
+  startTime   DateTime // 开始时间
+  endTime     DateTime? // 结束时间
   viewCount   Int        @default(0) // 观看人数
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -370,9 +370,9 @@ model Live {
 }
 
 enum LiveStatus {
-  UPCOMING  // 预告
-  LIVE      // 直播中
-  ENDED     // 已结束
+  UPCOMING // 预告
+  LIVE // 直播中
+  ENDED // 已结束
   CANCELLED // 已取消
 }
 
@@ -380,16 +380,16 @@ enum LiveStatus {
 // 直播观看记录模型 - LiveWatchRecord
 // ============================================
 model LiveWatchRecord {
-  id          String   @id @default(cuid())
-  liveId      String   // 直播ID
-  userId      String   // 用户ID
-  watchTime   Int      @default(0) // 观看时长（秒）
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  liveId    String // 直播ID
+  userId    String // 用户ID
+  watchTime Int      @default(0) // 观看时长（秒）
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // 关联关系
-  live        Live     @relation(fields: [liveId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  live Live @relation(fields: [liveId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([liveId, userId])
   @@index([userId])
@@ -401,18 +401,18 @@ model LiveWatchRecord {
 // 专家模型 - Expert (扩展Doctor)
 // ============================================
 model Expert {
-  id          String   @id @default(cuid())
-  doctorId    String   @unique // 关联Doctor
-  photo       String?  // 专家照片（需抠图处理）
-  introduction String? @db.Text // 专家简介
-  achievements String? @db.Text // 成就/荣誉
-  isFeatured  Boolean  @default(false) // 是否推荐
-  sortOrder   Int      @default(0) // 排序
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  doctorId     String   @unique // 关联Doctor
+  photo        String? // 专家照片（需抠图处理）
+  introduction String?  @db.Text // 专家简介
+  achievements String?  @db.Text // 成就/荣誉
+  isFeatured   Boolean  @default(false) // 是否推荐
+  sortOrder    Int      @default(0) // 排序
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // 关联关系
-  doctor      Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 
   @@index([doctorId])
   @@index([isFeatured])
@@ -423,18 +423,18 @@ model Expert {
 // 资源模型 - Resource
 // ============================================
 model Resource {
-  id          String         @id @default(cuid())
-  title       String         // 资源标题
-  description String?        @db.Text
-  type        ResourceType   // 资源类型
-  fileUrl     String         // 文件URL
-  cover       String?        // 封面图片（用于图片库）
-  category    String?        // 资源分类
-  viewCount   Int            @default(0) // 查看次数
-  downloadCount Int          @default(0) // 下载次数
-  status      ResourceStatus @default(PUBLISHED) // 状态
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id            String         @id @default(cuid())
+  title         String // 资源标题
+  description   String?        @db.Text
+  type          ResourceType // 资源类型
+  fileUrl       String // 文件URL
+  cover         String? // 封面图片（用于图片库）
+  category      String? // 资源分类
+  viewCount     Int            @default(0) // 查看次数
+  downloadCount Int            @default(0) // 下载次数
+  status        ResourceStatus @default(PUBLISHED) // 状态
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 
   @@index([type])
   @@index([category])
@@ -444,10 +444,10 @@ model Resource {
 }
 
 enum ResourceType {
-  PDF     // PDF文档
-  IMAGE   // 图片
-  VIDEO   // 视频
-  OTHER   // 其他
+  PDF // PDF文档
+  IMAGE // 图片
+  VIDEO // 视频
+  OTHER // 其他
 }
 
 enum ResourceStatus {
@@ -460,17 +460,16 @@ enum ResourceStatus {
 // 用户积分模型 - UserPoints
 // ============================================
 model UserPoints {
-  id          String   @id @default(cuid())
-  userId      String   @unique // 用户ID
-  totalPoints Int      @default(0) // 总积分
-  availablePoints Int  @default(0) // 可用积分
-  usedPoints  Int      @default(0) // 已使用积分
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  userId          String   @unique // 用户ID
+  totalPoints     Int      @default(0) // 总积分
+  availablePoints Int      @default(0) // 可用积分
+  usedPoints      Int      @default(0) // 已使用积分
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // 关联关系
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  logs        PointsLog[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("user_points")
@@ -480,16 +479,16 @@ model UserPoints {
 // 积分流水模型 - PointsLog
 // ============================================
 model PointsLog {
-  id          String      @id @default(cuid())
-  userId      String      // 用户ID
-  points      Int         // 积分变化（正数为获得，负数为消耗）
-  type        PointsType  // 积分类型
-  description String?     // 描述
-  relatedId   String?     // 关联ID（如课程ID、直播ID等）
-  createdAt   DateTime    @default(now())
+  id          String     @id @default(cuid())
+  userId      String // 用户ID
+  points      Int // 积分变化（正数为获得，负数为消耗）
+  type        PointsType // 积分类型
+  description String? // 描述
+  relatedId   String? // 关联ID（如课程ID、直播ID等）
+  createdAt   DateTime   @default(now())
 
   // 关联关系
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([type])
@@ -498,12 +497,12 @@ model PointsLog {
 }
 
 enum PointsType {
-  CHECK_IN      // 签到
-  WATCH_VIDEO   // 观看视频
-  WATCH_LIVE    // 观看直播
-  EXCHANGE      // 兑换
-  ADMIN_ADJUST  // 管理员调整
-  OTHER         // 其他
+  CHECK_IN // 签到
+  WATCH_VIDEO // 观看视频
+  WATCH_LIVE // 观看直播
+  EXCHANGE // 兑换
+  ADMIN_ADJUST // 管理员调整
+  OTHER // 其他
 }
 
 // ============================================
@@ -511,14 +510,14 @@ enum PointsType {
 // ============================================
 model CheckIn {
   id              String   @id @default(cuid())
-  userId          String   // 用户ID
+  userId          String // 用户ID
   checkInDate     DateTime @default(now()) // 签到日期
   consecutiveDays Int      @default(1) // 连续签到天数
   points          Int      @default(0) // 本次获得积分
   createdAt       DateTime @default(now())
 
   // 关联关系
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, checkInDate])
   @@index([userId])
@@ -530,15 +529,15 @@ model CheckIn {
 // 积分规则配置模型 - PointsRule
 // ============================================
 model PointsRule {
-  id          String   @id @default(cuid())
+  id          String     @id @default(cuid())
   type        PointsType // 积分类型
-  name        String   // 规则名称
-  points      Int      // 积分值
-  dailyLimit  Int?     // 每日上限（null表示无上限）
-  description String?  @db.Text
-  isEnabled   Boolean  @default(true) // 是否启用
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  name        String // 规则名称
+  points      Int // 积分值
+  dailyLimit  Int? // 每日上限（null表示无上限）
+  description String?    @db.Text
+  isEnabled   Boolean    @default(true) // 是否启用
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   @@unique([type])
   @@index([type])
