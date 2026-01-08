@@ -19,8 +19,8 @@ export const config = {
 
   // JWT配置
   jwt: {
-    secret: process.env.JWT_SECRET || 'default-secret-change-in-production',
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    secret: (process.env.JWT_SECRET || 'default-secret-change-in-production') as string,
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string,
   },
 
   // 数据库配置
