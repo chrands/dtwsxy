@@ -104,7 +104,7 @@ export class AuthHelper {
 
     return {
       userId: user.id,
-      email: user.email,
+      email: user.email || '',
       role: user.role,
     };
   }
