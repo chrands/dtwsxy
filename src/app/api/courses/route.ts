@@ -31,7 +31,17 @@ export async function GET(request: NextRequest) {
 
     const validatedParams = await Validator.validateQuery(queryCoursesSchema, queryParams);
 
-    const result = await CourseService.queryCourses(validatedParams);
+    const result = await CourseService.queryCourses({
+      page: validatedParams.page ?? 1,
+      pageSize: validatedParams.pageSize ?? 20,
+      categoryId: validatedParams.categoryId,
+      department: validatedParams.department,
+      authorId: validatedParams.authorId,
+      status: validatedParams.status,
+      isFree: validatedParams.isFree,
+      keyword: validatedParams.keyword,
+      sortBy: validatedParams.sortBy,
+    });
 
     return ResponseHelper.successWithPagination(result.items, {
       page: result.page,

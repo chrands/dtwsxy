@@ -43,11 +43,15 @@ export async function GET(request: NextRequest) {
     const validatedParams = await Validator.validateQuery(queryOrdersSchema, queryParams);
 
     // 非管理员只能查询自己的订单
-    if (currentUser.role !== 'ADMIN') {
-      validatedParams.userId = currentUser.userId;
-    }
+    const userId = currentUser.role !== 'ADMIN' ? currentUser.userId : validatedParams.userId;
 
-    const result = await OrderService.queryOrders(validatedParams);
+    const result = await OrderService.queryOrders({
+      page: validatedParams.page ?? 1,
+      pageSize: validatedParams.pageSize ?? 20,
+      userId,
+      status: validatedParams.status,
+      productType: validatedParams.productType,
+    });
 
     return ResponseHelper.successWithPagination(result.items, {
       page: result.page,

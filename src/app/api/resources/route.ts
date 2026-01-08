@@ -27,7 +27,13 @@ export async function GET(request: NextRequest) {
 
     const validatedParams = await Validator.validateQuery(queryResourcesSchema, queryParams);
 
-    const result = await ResourceService.queryResources(validatedParams);
+    const result = await ResourceService.queryResources({
+      page: validatedParams.page ?? 1,
+      pageSize: validatedParams.pageSize ?? 20,
+      type: validatedParams.type,
+      category: validatedParams.category,
+      keyword: validatedParams.keyword,
+    });
 
     return ResponseHelper.successWithPagination(result.items, {
       page: result.page,

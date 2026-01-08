@@ -261,10 +261,10 @@ npx prisma studio
 
 ```bash
 # 确保在项目根目录
-cd /www/wwwroot/dtwsxy
+
 
 # 构建生产版本
-npm run build
+
 
 # 构建成功后，会生成 .next 目录
 ```
