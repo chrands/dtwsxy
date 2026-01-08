@@ -13,7 +13,7 @@ import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 
 const loginSchema = z.object({
-  email: CommonSchemas.email,
+  account: z.string().min(1, '账号不能为空'), // 支持邮箱、手机号或用户名
   password: z.string().min(1, '密码不能为空'),
 });
 
@@ -25,13 +25,28 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = await Validator.validateBody(loginSchema, body);
 
+    // 判断账号类型：邮箱、手机号或用户名
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(validatedData.account);
+    const isPhone = /^1[3-9]\d{9}$/.test(validatedData.account);
+
+    // 构建查询条件
+    let where: any;
+    if (isEmail) {
+      where = { email: validatedData.account };
+    } else if (isPhone) {
+      where = { phone: validatedData.account };
+    } else {
+      // 用户名（字母、数字）
+      where = { nickname: validatedData.account };
+    }
+
     // 查找用户
-    const user = await prisma.user.findUnique({
-      where: { email: validatedData.email },
+    const user = await prisma.user.findFirst({
+      where,
     });
 
     if (!user) {
-      throw new UnauthorizedError('邮箱或密码错误');
+      throw new UnauthorizedError('账号或密码错误');
     }
 
     // 验证密码
@@ -41,7 +56,7 @@ export async function POST(request: NextRequest) {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedError('邮箱或密码错误');
+      throw new UnauthorizedError('账号或密码错误');
     }
 
     // 检查账户状态
@@ -52,7 +67,7 @@ export async function POST(request: NextRequest) {
     // 生成 Token
     const token = AuthHelper.generateToken({
       userId: user.id,
-      email: user.email,
+      email: user.email || '',
       role: user.role,
     });
 

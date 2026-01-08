@@ -1,0 +1,331 @@
+Prototype<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>稻田蛙声学院 - Dauteenvoice College</title>
+    
+    <!-- 核心库 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            DEFAULT: '#1499A8',
+                            light: '#E0F2F4',
+                            dark: '#0E737E'
+                        },
+                        dark: '#334155',
+                        sub: '#94A3B8',
+                        bg: '#F8FAFC'
+                    },
+                    boxShadow: {
+                        'float': '0 8px 20px -8px rgba(20, 153, 168, 0.15)', // 阴影也调收敛一点
+                        'card': '0 2px 4px -1px rgba(0, 0, 0, 0.04)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
+        [x-cloak] { display: none !important; }
+        
+        /* 登录页背景纹理 */
+        .bg-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#1499A8 0.5px, transparent 0.5px), radial-gradient(#1499A8 0.5px, #ffffff 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            opacity: 0.05;
+        }
+    </style>
+
+    <script>
+        function app() {
+            return {
+                isLoggedIn: false, // 核心状态：是否登录
+                view: 'home',      // current view
+                tab: 'home',       // current tab
+                showLoginModal: false, // 登录引导弹窗
+                
+                // 注册表单数据
+                registerForm: {
+                    role: 'medical', // medical | other
+                    name: '',
+                    phone: '',
+                    hospital: '',
+                    dept: '',
+                    title: ''
+                },
+
+                // 模拟数据
+                categories: [
+                    { id: 'all', name: '全部' },
+                    { id: 'c1', name: '皮肤美容缝合' },
+                    { id: 'c2', name: '胃肠吻合加固' },
+                    { id: 'c3', name: '共同开口关闭' },
+                    { id: 'c4', name: '胆总管吻合' },
+                    { id: 'c5', name: '引流管固定' },
+                    { id: 'c6', name: '关节囊缝合' },
+                    { id: 'c7', name: '子宫双层缝合' }
+                ],
+                courses: [
+                    { id: 1, title: '面部美容缝合：减张缝合的核心技巧', author: '张教授 · 协和', img: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=800&q=80', isVip: true },
+                    { id: 2, title: '腹腔镜下胆总管吻合术全流程演示', author: '李主任 · 华西', img: 'https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=800&q=80', isVip: false },
+                    { id: 3, title: '复杂关节囊缝合的针法解析', author: '王博士 · 北医三院', img: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&w=800&q=80', isVip: true },
+                ],
+
+                init() {
+                    this.$watch('view', () => setTimeout(() => lucide.createIcons(), 50));
+                    setTimeout(() => lucide.createIcons(), 100);
+                },
+
+                // 核心鉴权函数：所有点击行为都经过这里
+                checkAuth(callback) {
+                    if (this.isLoggedIn) {
+                        callback();
+                    } else {
+                        this.showLoginModal = true;
+                    }
+                },
+
+                goToLogin() {
+                    this.showLoginModal = false;
+                    this.view = 'login';
+                },
+
+                doLogin() {
+                    // 模拟登录成功
+                    this.isLoggedIn = true;
+                    this.view = 'home';
+                }
+            }
+        }
+    </script>
+</head>
+<body x-data="app()" x-init="init()" class="bg-gray-100 min-h-screen flex items-center justify-center text-dark">
+
+    <!-- 手机外壳 (圆角调整：rounded-[24px]) -->
+    <div class="w-full max-w-md h-[100dvh] sm:h-[850px] bg-bg relative shadow-2xl overflow-hidden flex flex-col sm:rounded-[24px] sm:border-[8px] sm:border-white">
+
+        <!-- ==================== 1. 全局登录引导弹窗 (Modal - 更小更精致) ==================== -->
+        <div x-show="showLoginModal" x-cloak class="absolute inset-0 z-[60] flex items-center justify-center px-8">
+            <!-- 遮罩 -->
+            <div class="absolute inset-0 bg-black/30 backdrop-blur-[2px]" @click="showLoginModal = false" x-transition.opacity></div>
+            
+            <!-- 弹窗内容 (宽度缩小至 280px，圆角减小，Padding 减小) -->
+            <div class="bg-white w-full max-w-[280px] rounded-xl p-5 relative z-10 shadow-xl transform transition-all"
+                 x-transition:enter="ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100">
+                
+                <div class="w-10 h-10 bg-brand/10 rounded-lg flex items-center justify-center mb-3 mx-auto text-brand">
+                    <i data-lucide="lock" class="w-5 h-5"></i>
+                </div>
+                
+                <h3 class="text-base font-bold text-center mb-1 text-dark">需要登录</h3>
+                <p class="text-xs text-center text-sub mb-5 leading-relaxed">登录后即可观看完整手术教学视频及查看专家专栏。</p>
+                
+                <div class="space-y-2.5">
+                    <button @click="goToLogin()" class="w-full py-2.5 bg-brand text-white text-sm font-bold rounded-lg shadow-sm active:bg-brand-dark transition-colors">
+                        立即登录/注册
+                    </button>
+                    <button @click="showLoginModal = false" class="w-full py-2.5 text-sub text-xs font-medium rounded-lg hover:bg-gray-50 transition-colors">
+                        暂不登录
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 2. 登录注册页 (圆角更方正) ==================== -->
+        <div x-show="view === 'login'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0" class="absolute inset-0 z-50 bg-white flex flex-col overflow-y-auto">
+            <div class="absolute inset-0 bg-pattern pointer-events-none"></div>
+            
+            <div class="p-8 pt-12 relative z-10">
+                <button @click="view = 'home'" class="absolute top-6 left-6 p-2 -ml-2 text-gray-400 hover:text-dark">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+
+                <div class="mb-8 mt-4">
+                    <h1 class="text-2xl font-bold text-dark mb-1">欢迎加入</h1>
+                    <h1 class="text-2xl font-bold text-brand mb-2">稻田蛙声学院</h1>
+                    <p class="text-xs text-sub">Medical Continuing Education Platform</p>
+                </div>
+
+                <!-- 身份切换 (圆角 rounded-lg) -->
+                <div class="bg-gray-50 p-1 rounded-lg flex mb-6 border border-gray-100">
+                    <button @click="registerForm.role = 'medical'" :class="registerForm.role === 'medical' ? 'bg-white text-brand shadow-sm font-bold' : 'text-sub'" class="flex-1 py-2 text-sm rounded-md transition-all">医护人员</button>
+                    <button @click="registerForm.role = 'other'" :class="registerForm.role === 'other' ? 'bg-white text-brand shadow-sm font-bold' : 'text-sub'" class="flex-1 py-2 text-sm rounded-md transition-all">非医务人员</button>
+                </div>
+
+                <!-- 表单区域 (圆角 rounded-lg) -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-dark mb-1.5 ml-1">姓名</label>
+                        <input type="text" x-model="registerForm.name" placeholder="请输入真实姓名" class="w-full px-4 py-3 bg-gray-50 rounded-lg border border-gray-100 focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all text-sm">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-dark mb-1.5 ml-1">手机号</label>
+                        <input type="tel" x-model="registerForm.phone" placeholder="用于接收验证码" class="w-full px-4 py-3 bg-gray-50 rounded-lg border border-gray-100 focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all text-sm">
+                    </div>
+
+                    <!-- 医护人员专属字段 -->
+                    <div x-show="registerForm.role === 'medical'" x-transition class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-dark mb-1.5 ml-1">所属医院</label>
+                            <div class="relative">
+                                <i data-lucide="building-2" class="absolute right-3 top-3 text-gray-300 w-5 h-5"></i>
+                                <input type="text" placeholder="搜索医院名称" class="w-full px-4 py-3 bg-gray-50 rounded-lg border border-gray-100 focus:border-brand outline-none text-sm">
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex-1">
+                                <label class="block text-xs font-bold text-dark mb-1.5 ml-1">科室</label>
+                                <input type="text" placeholder="如：普外科" class="w-full px-4 py-3 bg-gray-50 rounded-lg border border-gray-100 focus:border-brand outline-none text-sm">
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-xs font-bold text-dark mb-1.5 ml-1">职称</label>
+                                <select class="w-full px-4 py-3 bg-gray-50 rounded-lg border border-gray-100 focus:border-brand outline-none text-sm text-dark appearance-none">
+                                    <option>请选择</option>
+                                    <option>住院医师</option>
+                                    <option>主治医师</option>
+                                    <option>副主任医师</option>
+                                    <option>主任医师</option>
+                                    <option>护师/护士</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 密码 -->
+                    <div>
+                        <label class="block text-xs font-bold text-dark mb-1.5 ml-1">设置密码</label>
+                        <input type="password" placeholder="6-20位字符" class="w-full px-4 py-3 bg-gray-50 rounded-lg border border-gray-100 focus:border-brand focus:ring-1 focus:ring-brand outline-none transition-all text-sm">
+                    </div>
+                </div>
+
+                <button @click="doLogin()" class="w-full mt-8 py-3.5 bg-brand text-white font-bold rounded-lg shadow-lg shadow-brand/20 active:scale-[0.98] transition-transform flex items-center justify-center gap-2">
+                    <span>立即注册并登录</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+                
+                <p class="text-center text-xs text-sub mt-4">
+                    点击注册即代表同意 <a href="#" class="text-brand underline">用户协议</a> 与 <a href="#" class="text-brand underline">隐私政策</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- ==================== 3. 主界面 ==================== -->
+        <main class="flex-1 overflow-y-auto no-scrollbar pb-24 bg-bg">
+            <!-- Header -->
+            <header class="px-6 pt-10 pb-2 flex justify-between items-center bg-white/90 backdrop-blur-md sticky top-0 z-20">
+                <div>
+                    <h2 class="text-lg font-bold text-dark flex items-center gap-2">
+                        稻田蛙声学院
+                        <span x-show="!isLoggedIn" class="text-[10px] bg-gray-100 text-sub px-2 py-0.5 rounded font-normal">游客</span>
+                    </h2>
+                </div>
+                <div @click="checkAuth(() => { view='profile'; tab='profile' })" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sub cursor-pointer active:scale-95">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+            </header>
+
+            <!-- 首页内容 -->
+            <div x-show="tab === 'home'" class="px-6 py-4 space-y-6">
+                <!-- 鉴权 Banner (圆角 rounded-xl) -->
+                <div @click="checkAuth(() => console.log('Banner clicked'))" class="relative w-full aspect-[2/1] rounded-xl bg-dark overflow-hidden shadow-float active:scale-[0.99] transition-transform cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1551818255-e6e10975bc17?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover opacity-80">
+                    <div class="absolute bottom-4 left-4 right-4">
+                        <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded mb-2 inline-block">LIVE 直播中</span>
+                        <h3 class="text-white font-bold">微创外科高峰论坛</h3>
+                    </div>
+                </div>
+
+                <!-- 鉴权金刚区 (圆角 rounded-xl) -->
+                <div class="grid grid-cols-4 gap-4">
+                    <div @click="checkAuth(() => {})" class="flex flex-col items-center gap-2 cursor-pointer active:opacity-70">
+                        <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-brand shadow-sm border border-gray-50">
+                            <i data-lucide="calendar-check" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs text-sub">签到</span>
+                    </div>
+                    <div @click="checkAuth(() => {})" class="flex flex-col items-center gap-2 cursor-pointer active:opacity-70">
+                        <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-purple-500 shadow-sm border border-gray-50">
+                            <i data-lucide="video" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs text-sub">回顾</span>
+                    </div>
+                    <div @click="checkAuth(() => {})" class="flex flex-col items-center gap-2 cursor-pointer active:opacity-70">
+                        <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-orange-500 shadow-sm border border-gray-50">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs text-sub">专家</span>
+                    </div>
+                    <div @click="checkAuth(() => {})" class="flex flex-col items-center gap-2 cursor-pointer active:opacity-70">
+                        <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-blue-500 shadow-sm border border-gray-50">
+                            <i data-lucide="book" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs text-sub">资料</span>
+                    </div>
+                </div>
+
+                <!-- 鉴权课程列表 (圆角 rounded-lg) -->
+                <div class="space-y-4">
+                    <h3 class="font-bold text-dark text-base">精品课程</h3>
+                    <template x-for="c in courses">
+                        <div @click="checkAuth(() => {})" class="bg-white p-3 rounded-lg flex gap-4 shadow-card active:scale-[0.99] transition-transform cursor-pointer border border-gray-50">
+                            <div class="w-24 h-20 rounded-md bg-gray-200 shrink-0 overflow-hidden relative">
+                                <img :src="c.img" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 flex items-center justify-center bg-black/10">
+                                    <i data-lucide="lock" class="w-5 h-5 text-white/90"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 flex flex-col justify-between py-0.5">
+                                <h4 class="font-bold text-sm text-dark leading-snug" x-text="c.title"></h4>
+                                <div class="flex justify-between items-center text-xs text-sub">
+                                    <span x-text="c.author"></span>
+                                    <span class="text-brand bg-brand/5 px-2 py-0.5 rounded text-[10px]">去学习</span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- 其他 Tab 占位 -->
+            <div x-show="tab !== 'home'" class="h-full flex flex-col items-center justify-center p-6 text-center">
+                <i data-lucide="lock" class="w-10 h-10 text-gray-200 mb-4"></i>
+                <p class="text-sub text-sm mb-4">该板块内容仅对认证医护人员开放</p>
+                <button @click="goToLogin()" class="px-6 py-2 bg-brand text-white text-sm font-bold rounded-lg shadow-lg shadow-brand/20">立即登录</button>
+            </div>
+        </main>
+
+        <!-- ==================== 底部导航栏 ==================== -->
+        <div class="absolute bottom-0 w-full bg-white/95 backdrop-blur-md border-t border-gray-100 h-[70px] flex justify-around items-center z-30 pb-1">
+            <button @click="tab = 'home'" class="flex flex-col items-center gap-1 w-16 transition-colors" :class="tab === 'home' ? 'text-brand' : 'text-gray-300'">
+                <i data-lucide="layout-grid" class="w-5 h-5" :stroke-width="tab === 'home' ? 2.5 : 2"></i>
+                <span class="text-[10px] font-medium">首页</span>
+            </button>
+            <button @click="checkAuth(() => tab = 'course')" class="flex flex-col items-center gap-1 w-16 transition-colors" :class="tab === 'course' ? 'text-brand' : 'text-gray-300'">
+                <i data-lucide="play-square" class="w-5 h-5" :stroke-width="tab === 'course' ? 2.5 : 2"></i>
+                <span class="text-[10px] font-medium">课程</span>
+            </button>
+            <button @click="checkAuth(() => tab = 'profile')" class="flex flex-col items-center gap-1 w-16 transition-colors" :class="tab === 'profile' ? 'text-brand' : 'text-gray-300'">
+                <i data-lucide="user" class="w-5 h-5" :stroke-width="tab === 'profile' ? 2.5 : 2"></i>
+                <span class="text-[10px] font-medium">我的</span>
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>

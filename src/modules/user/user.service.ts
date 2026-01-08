@@ -4,23 +4,31 @@
  */
 
 import { prisma } from '@/lib/prisma';
-import { NotFoundError, ConflictError } from '@/lib/errors';
-import type { CreateUserParams, UpdateUserParams, QueryUsersParams, PublicUser } from './user.types';
+import { NotFoundError, ConflictError, BadRequestError } from '@/lib/errors';
+import type { CreateUserParams, UpdateUserParams, QueryUsersParams, PublicUser, VerifyMedicalParams } from './user.types';
 import type { PaginatedResult } from '@/types';
 import bcrypt from 'bcryptjs';
+import { UserType } from '@prisma/client';
 
 export class UserService {
   /**
    * 创建用户
    */
   static async createUser(params: CreateUserParams): Promise<PublicUser> {
-    // 检查邮箱是否已存在
-    const existingUser = await prisma.user.findUnique({
-      where: { email: params.email },
-    });
+    // 验证：必须提供邮箱或手机号至少一个
+    if (!params.email && !params.phone) {
+      throw new BadRequestError('必须提供邮箱或手机号');
+    }
 
-    if (existingUser) {
-      throw new ConflictError('邮箱已被注册');
+    // 检查邮箱是否已存在
+    if (params.email) {
+      const existingUser = await prisma.user.findUnique({
+        where: { email: params.email },
+      });
+
+      if (existingUser) {
+        throw new ConflictError('邮箱已被注册');
+      }
     }
 
     // 检查手机号是否已存在
@@ -34,15 +42,41 @@ export class UserService {
       }
     }
 
+    // 医护人员注册验证
+    if (params.userType === UserType.MEDICAL_STAFF) {
+      if (!params.hospital || !params.department || !params.title) {
+        throw new BadRequestError('医护人员注册必须填写医院、科室和职称');
+      }
+    }
+
     // 密码加密
     const hashedPassword = await bcrypt.hash(params.password, 10);
 
-    // 创建用户
+    // 创建用户（包含医护人员信息）
     try {
+      const { hospital, department, title, specialty, experience, certification, bio, ...userData } = params;
+
       const user = await prisma.user.create({
         data: {
-          ...params,
+          ...userData,
           password: hashedPassword,
+          userType: params.userType || UserType.NON_MEDICAL,
+          // 如果是医护人员，创建 Doctor 记录
+          doctorProfile: params.userType === UserType.MEDICAL_STAFF && hospital && department && title ? {
+            create: {
+              hospital,
+              department,
+              title,
+              specialty: specialty || '',
+              experience: experience || 0,
+              certification,
+              bio,
+              isVerified: false, // 初始未认证，需要后续审核
+            },
+          } : undefined,
+        },
+        include: {
+          doctorProfile: true,
         },
       });
 
@@ -64,6 +98,53 @@ export class UserService {
       }
       throw error;
     }
+  }
+
+  /**
+   * 医护人员认证
+   */
+  static async verifyMedical(userId: string, params: VerifyMedicalParams): Promise<PublicUser> {
+    const user = await this.getUserById(userId);
+
+    if (user.userType !== UserType.MEDICAL_STAFF) {
+      throw new BadRequestError('只有医护人员可以进行认证');
+    }
+
+    // 更新或创建 Doctor 记录
+    await prisma.doctor.upsert({
+      where: { userId },
+      create: {
+        userId,
+        hospital: params.hospital,
+        department: params.department,
+        title: params.title,
+        specialty: params.specialty || '',
+        experience: params.experience || 0,
+        certification: params.certification,
+        bio: params.bio,
+        isVerified: false, // 需要管理员审核
+      },
+      update: {
+        hospital: params.hospital,
+        department: params.department,
+        title: params.title,
+        specialty: params.specialty || '',
+        experience: params.experience || 0,
+        certification: params.certification,
+        bio: params.bio,
+      },
+    });
+
+    // 更新用户认证状态
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        isMedicalVerified: false, // 等待审核
+      },
+    });
+
+    const { password, ...publicUser } = updatedUser;
+    return publicUser;
   }
 
   /**
@@ -129,7 +210,7 @@ export class UserService {
    * 查询用户列表（分页）
    */
   static async queryUsers(params: QueryUsersParams): Promise<PaginatedResult<PublicUser>> {
-    const { page, pageSize, role, status, keyword } = params;
+    const { page, pageSize, role, status, userType, keyword } = params;
     const skip = (page - 1) * pageSize;
 
     // 构建查询条件
@@ -141,6 +222,10 @@ export class UserService {
     
     if (status) {
       where.status = status;
+    }
+
+    if (userType) {
+      where.userType = userType;
     }
     
     if (keyword) {

@@ -10,12 +10,37 @@ import { AuthHelper } from '@/lib/auth';
 import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { UserType } from '@prisma/client';
 
 const registerSchema = z.object({
-  email: CommonSchemas.email,
+  email: CommonSchemas.email.optional(),
   phone: CommonSchemas.phone.optional(),
   password: CommonSchemas.password,
   nickname: z.string().min(1, '昵称不能为空').max(50, '昵称最多50个字符'),
+  userType: z.enum(['MEDICAL_STAFF', 'NON_MEDICAL']).default('NON_MEDICAL'),
+  // 医护人员专属字段
+  hospital: z.string().min(1, '医院不能为空').optional(),
+  department: z.string().min(1, '科室不能为空').optional(),
+  title: z.string().min(1, '职称不能为空').optional(),
+  specialty: z.string().optional(),
+  experience: z.number().int().min(0).optional(),
+  certification: z.string().optional(),
+  bio: z.string().optional(),
+}).refine((data) => {
+  // 必须提供邮箱或手机号至少一个
+  return data.email || data.phone;
+}, {
+  message: '必须提供邮箱或手机号',
+  path: ['email'],
+}).refine((data) => {
+  // 医护人员必须填写医院、科室、职称
+  if (data.userType === 'MEDICAL_STAFF') {
+    return data.hospital && data.department && data.title;
+  }
+  return true;
+}, {
+  message: '医护人员注册必须填写医院、科室和职称',
+  path: ['hospital'],
 });
 
 /**
@@ -27,12 +52,15 @@ export async function POST(request: NextRequest) {
     const validatedData = await Validator.validateBody(registerSchema, body);
 
     // 创建用户
-    const user = await UserService.createUser(validatedData);
+    const user = await UserService.createUser({
+      ...validatedData,
+      userType: validatedData.userType as UserType,
+    });
 
     // 生成 Token
     const token = AuthHelper.generateToken({
       userId: user.id,
-      email: user.email,
+      email: user.email || '',
       role: user.role,
     });
 

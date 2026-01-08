@@ -3,17 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
+  --foreground-rgb: 51, 65, 85; /* #334155 - Slate 700 */
+  --background-start-rgb: 240, 238, 230; /* #F0EEE6 - Slate 50 */
   --background-end-rgb: 255, 255, 255;
+  --brand-color: 20, 153, 168; /* #1499A8 - 稻田青 */
+  --brand-light: 224, 242, 244; /* #E0F2F4 */
+  --brand-dark: 14, 115, 126; /* #0E737E */
+  --text-sub: 148, 163, 184; /* #94A3B8 - Slate 400 */
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: rgb(var(--background-start-rgb));
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  body {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* 隐藏滚动条但保持功能 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

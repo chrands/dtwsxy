@@ -56,6 +56,14 @@ export class ConflictError extends AppError {
   }
 }
 
+export class BadRequestError extends AppError {
+  constructor(message: string = '请求参数错误') {
+    super('BAD_REQUEST', message, 400);
+    this.name = 'BadRequestError';
+    Object.setPrototypeOf(this, BadRequestError.prototype);
+  }
+}
+
 export class BusinessError extends AppError {
   constructor(message: string, code: string = 'BUSINESS_ERROR') {
     super(code, message, 400);
