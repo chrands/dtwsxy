@@ -23,9 +23,9 @@
 
 ```bash
 # 示例仓库地址格式
-https://github.com/username/dauteenvoice-college.git
+https://github.com/username/dtwsxy.git
 # 或
-git@github.com:username/dauteenvoice-college.git
+git@github.com:username/dtwsxy.git
 ```
 
 ### 2. 服务器环境要求
@@ -147,19 +147,19 @@ sudo apt install git -y
 
 ```bash
 # 创建网站根目录（建议放在 /www/wwwroot/ 下，与宝塔默认目录一致）
-sudo mkdir -p /www/wwwroot/dauteenvoice-college
-sudo chown -R $USER:$USER /www/wwwroot/dauteenvoice-college
-cd /www/wwwroot/dauteenvoice-college
+sudo mkdir -p /www/wwwroot/dtwsxy
+sudo chown -R $USER:$USER /www/wwwroot/dtwsxy
+cd /www/wwwroot/dtwsxy
 ```
 
 ### 2. 从 Git 仓库克隆项目
 
 ```bash
 # 使用 HTTPS 方式克隆（推荐）
-git clone https://github.com/username/dauteenvoice-college.git .
+git clone https://github.com/chrands/dtwsxy.git
 
 # 或使用 SSH 方式（需要配置 SSH 密钥）
-# git clone git@github.com:username/dauteenvoice-college.git .
+# git clone git@github.com:username/dtwsxy.git .
 
 # 如果仓库是私有仓库，需要配置认证
 # 对于 HTTPS：使用用户名和访问令牌
@@ -170,7 +170,7 @@ git clone https://github.com/username/dauteenvoice-college.git .
 
 ```bash
 # 进入项目目录（如果不在的话）
-cd /www/wwwroot/dauteenvoice-college
+cd /www/wwwroot/dtwsxy
 
 # 安装依赖
 npm install
@@ -261,7 +261,7 @@ npx prisma studio
 
 ```bash
 # 确保在项目根目录
-cd /www/wwwroot/dauteenvoice-college
+cd /www/wwwroot/dtwsxy
 
 # 构建生产版本
 npm run build
@@ -281,10 +281,10 @@ nano ecosystem.config.js
 ```javascript
 module.exports = {
   apps: [{
-    name: 'dauteenvoice-college',
+    name: 'dtwsxy',
     script: 'npm',
     args: 'start',
-    cwd: '/www/wwwroot/dauteenvoice-college',
+    cwd: '/www/wwwroot/dtwsxy',
     instances: 1,
     autorestart: true,
     watch: false,
@@ -293,8 +293,8 @@ module.exports = {
       NODE_ENV: 'production',
       PORT: 5288
     },
-    error_file: '/www/wwwroot/dauteenvoice-college/logs/pm2-error.log',
-    out_file: '/www/wwwroot/dauteenvoice-college/logs/pm2-out.log',
+    error_file: '/www/wwwroot/dtwsxy/logs/pm2-error.log',
+    out_file: '/www/wwwroot/dtwsxy/logs/pm2-out.log',
     log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
     merge_logs: true
   }]
@@ -304,7 +304,7 @@ module.exports = {
 保存文件后，创建日志目录：
 
 ```bash
-mkdir -p /www/wwwroot/dauteenvoice-college/logs
+mkdir -p /www/wwwroot/dtwsxy/logs
 ```
 
 ### 3. 启动应用
@@ -317,10 +317,10 @@ pm2 start ecosystem.config.js
 pm2 status
 
 # 查看应用日志
-pm2 logs dauteenvoice-college
+pm2 logs dtwsxy
 
 # 查看实时日志
-pm2 logs dauteenvoice-college --lines 50
+pm2 logs dtwsxy --lines 50
 ```
 
 ### 4. 验证服务运行
@@ -358,7 +358,7 @@ pm2 startup
 3. 填写信息：
    - **域名**：`your-domain.com`（或使用 IP 地址）
    - **备注**：稻田蛙声学院
-   - **根目录**：`/www/wwwroot/dauteenvoice-college`（注意：这里指向项目根目录，但实际静态文件在 `.next` 目录）
+   - **根目录**：`/www/wwwroot/dtwsxy`（注意：这里指向项目根目录，但实际静态文件在 `.next` 目录）
    - **FTP**：不创建
    - **数据库**：不创建（已单独创建）
    - **PHP 版本**：纯静态（因为 Next.js 是 Node.js 应用）
@@ -375,8 +375,8 @@ server {
     server_name your-domain.com;  # 替换为您的域名
     
     # 日志配置
-    access_log /www/wwwroot/dauteenvoice-college/logs/nginx-access.log;
-    error_log /www/wwwroot/dauteenvoice-college/logs/nginx-error.log;
+    access_log /www/wwwroot/dtwsxy/logs/nginx-access.log;
+    error_log /www/wwwroot/dtwsxy/logs/nginx-error.log;
 
     # 客户端最大上传大小
     client_max_body_size 50M;
@@ -515,7 +515,7 @@ ALLOWED_ORIGINS=https://your-domain.com
 然后重启应用：
 
 ```bash
-pm2 restart dauteenvoice-college
+pm2 restart dtwsxy
 ```
 
 ---
@@ -526,7 +526,7 @@ pm2 restart dauteenvoice-college
 
 ```bash
 # 进入项目目录
-cd /www/wwwroot/dauteenvoice-college
+cd /www/wwwroot/dtwsxy
 
 # 拉取最新代码
 git pull origin main  # 或 master，根据您的分支名
@@ -542,10 +542,10 @@ npm run prisma:generate
 npm run build
 
 # 重启应用
-pm2 restart dauteenvoice-college
+pm2 restart dtwsxy
 
 # 查看日志确认无错误
-pm2 logs dauteenvoice-college --lines 50
+pm2 logs dtwsxy --lines 50
 ```
 
 ### 2. 查看日志
@@ -554,30 +554,30 @@ pm2 logs dauteenvoice-college --lines 50
 
 ```bash
 # 查看实时日志
-pm2 logs dauteenvoice-college
+pm2 logs dtwsxy
 
 # 查看最近 100 行日志
-pm2 logs dauteenvoice-college --lines 100
+pm2 logs dtwsxy --lines 100
 
 # 清空日志
-pm2 flush dauteenvoice-college
+pm2 flush dtwsxy
 ```
 
 #### Nginx 日志
 
 ```bash
 # 访问日志
-tail -f /www/wwwroot/dauteenvoice-college/logs/nginx-access.log
+tail -f /www/wwwroot/dtwsxy/logs/nginx-access.log
 
 # 错误日志
-tail -f /www/wwwroot/dauteenvoice-college/logs/nginx-error.log
+tail -f /www/wwwroot/dtwsxy/logs/nginx-error.log
 ```
 
 #### 应用日志
 
 应用日志位置：
-- PM2 输出日志：`/www/wwwroot/dauteenvoice-college/logs/pm2-out.log`
-- PM2 错误日志：`/www/wwwroot/dauteenvoice-college/logs/pm2-error.log`
+- PM2 输出日志：`/www/wwwroot/dtwsxy/logs/pm2-out.log`
+- PM2 错误日志：`/www/wwwroot/dtwsxy/logs/pm2-error.log`
 
 ### 3. PM2 常用命令
 
@@ -586,16 +586,16 @@ tail -f /www/wwwroot/dauteenvoice-college/logs/nginx-error.log
 pm2 list
 
 # 查看进程详情
-pm2 show dauteenvoice-college
+pm2 show dtwsxy
 
 # 重启应用
-pm2 restart dauteenvoice-college
+pm2 restart dtwsxy
 
 # 停止应用
-pm2 stop dauteenvoice-college
+pm2 stop dtwsxy
 
 # 删除应用（从 PM2 列表中移除）
-pm2 delete dauteenvoice-college
+pm2 delete dtwsxy
 
 # 查看资源使用情况
 pm2 monit
@@ -654,7 +654,7 @@ free -h
 
 ```bash
 # 查看详细错误日志
-pm2 logs dauteenvoice-college --err
+pm2 logs dtwsxy --err
 
 # 检查环境变量是否正确
 cat .env
@@ -663,7 +663,7 @@ cat .env
 netstat -tlnp | grep 5288
 
 # 手动测试启动
-cd /www/wwwroot/dauteenvoice-college
+cd /www/wwwroot/dtwsxy
 npm start
 ```
 
@@ -732,7 +732,7 @@ sudo ufw status
 **解决方案**：
 - 检查 `.next` 目录是否存在且包含构建文件
 - 确认 Nginx 配置中的静态文件路径正确
-- 检查文件权限：`chmod -R 755 /www/wwwroot/dauteenvoice-college/.next`
+- 检查文件权限：`chmod -R 755 /www/wwwroot/dtwsxy/.next`
 
 ### 5. 内存不足
 
@@ -833,19 +833,19 @@ cat prisma/schema.prisma
 
 ```bash
 # 进入项目目录
-cd /www/wwwroot/dauteenvoice-college
+cd /www/wwwroot/dtwsxy
 
 # 更新代码并重启
-git pull && npm install && npm run build && pm2 restart dauteenvoice-college
+git pull && npm install && npm run build && pm2 restart dtwsxy
 
 # 查看应用状态
 pm2 status
 
 # 查看实时日志
-pm2 logs dauteenvoice-college
+pm2 logs dtwsxy
 
 # 重启应用
-pm2 restart dauteenvoice-college
+pm2 restart dtwsxy
 
 # 重载 Nginx
 sudo systemctl reload nginx
@@ -864,7 +864,7 @@ htop
 df -h
 
 # 查看最近错误
-pm2 logs dauteenvoice-college --err --lines 50
+pm2 logs dtwsxy --err --lines 50
 ```
 
 ---
