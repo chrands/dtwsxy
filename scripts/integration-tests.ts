@@ -54,7 +54,7 @@ function randomPhone() {
 }
 
 async function main() {
-  process.env.NODE_ENV = 'test';
+  (process.env as any).NODE_ENV = 'test';
 
   const testDbUrl = process.env.TEST_DATABASE_URL || process.env.DATABASE_URL;
   const allowUnsafe = process.env.ALLOW_DB_TESTS === 'true';
