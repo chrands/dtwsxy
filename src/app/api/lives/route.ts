@@ -11,6 +11,9 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { LiveStatus } from '@prisma/client';
 
+// 强制动态渲染，因为使用了 request.url
+export const dynamic = 'force-dynamic';
+
 const queryLivesSchema = CommonSchemas.pagination.extend({
   status: z.nativeEnum(LiveStatus).optional(),
   keyword: z.string().optional(),

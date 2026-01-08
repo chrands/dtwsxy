@@ -11,6 +11,9 @@ import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
+// 强制动态渲染，因为使用了 request.headers 和 request.url
+export const dynamic = 'force-dynamic';
+
 const queryUsersSchema = CommonSchemas.pagination.extend({
   role: z.enum(['USER', 'DOCTOR', 'ADMIN']).optional(),
   status: z.enum(['ACTIVE', 'INACTIVE', 'BANNED']).optional(),

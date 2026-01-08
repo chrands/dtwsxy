@@ -11,6 +11,9 @@ import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
+// 强制动态渲染，因为使用了 request.url 和 request.headers
+export const dynamic = 'force-dynamic';
+
 const createPostSchema = z.object({
   authorId: z.string().min(1, '作者ID不能为空'),
   title: z.string().min(1, '标题不能为空').max(200, '标题最多200个字符'),

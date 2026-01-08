@@ -13,6 +13,9 @@ import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
+// 强制动态渲染，因为需要访问数据库和生成 token
+export const dynamic = 'force-dynamic';
+
 const loginSchema = z.object({
   account: z.string().min(1, '账号不能为空'), // 支持邮箱、手机号或用户名
   password: z.string().min(1, '密码不能为空'),

@@ -8,6 +8,9 @@ import { prisma } from '@/lib/prisma';
 import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 
+// 强制动态渲染，因为需要访问数据库
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/courses/categories - 获取分类列表
  */

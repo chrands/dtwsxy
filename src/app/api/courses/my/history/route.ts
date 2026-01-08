@@ -10,6 +10,9 @@ import { CourseService } from '@/modules/course/course.service';
 import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 
+// 强制动态渲染，因为使用了 request.headers 和 request.url
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/courses/my/history - 获取我的观看历史
  */

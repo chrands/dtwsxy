@@ -12,6 +12,9 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { PointsType } from '@prisma/client';
 
+// 强制动态渲染，因为使用了 request.headers 和 request.url
+export const dynamic = 'force-dynamic';
+
 const queryLogsSchema = CommonSchemas.pagination.extend({
   type: z.nativeEnum(PointsType).optional(),
 });

@@ -10,6 +10,9 @@ import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
+// 强制动态渲染，因为使用了 request.url
+export const dynamic = 'force-dynamic';
+
 const queryExpertsSchema = CommonSchemas.pagination.extend({
   isFeatured: z.boolean().optional(),
   keyword: z.string().optional(),

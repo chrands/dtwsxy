@@ -11,6 +11,9 @@ import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
+// 强制动态渲染，因为使用了 request.headers
+export const dynamic = 'force-dynamic';
+
 const exchangeSchema = z.object({
   points: z.number().int().positive('积分必须大于0'),
   type: z.string().min(1, '兑换类型不能为空'),

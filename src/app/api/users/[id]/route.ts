@@ -11,6 +11,9 @@ import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
+// 强制动态渲染，因为使用了 request.headers
+export const dynamic = 'force-dynamic';
+
 const updateUserSchema = z.object({
   nickname: z.string().min(1).max(50).optional(),
   avatar: z.string().url('头像必须是有效的URL').optional(),

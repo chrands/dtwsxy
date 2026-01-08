@@ -12,6 +12,9 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { UserType } from '@prisma/client';
 
+// 强制动态渲染，因为需要访问数据库和生成 token
+export const dynamic = 'force-dynamic';
+
 const registerSchema = z.object({
   email: CommonSchemas.email.optional(),
   phone: CommonSchemas.phone.optional(),

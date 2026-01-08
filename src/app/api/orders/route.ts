@@ -11,6 +11,9 @@ import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
+// 强制动态渲染，因为使用了 request.url 和 request.headers
+export const dynamic = 'force-dynamic';
+
 const createOrderSchema = z.object({
   userId: z.string().min(1, '用户ID不能为空'),
   productType: z.string().min(1, '产品类型不能为空'),

@@ -11,6 +11,9 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { ResourceType } from '@prisma/client';
 
+// 强制动态渲染，因为使用了 request.url
+export const dynamic = 'force-dynamic';
+
 const queryResourcesSchema = CommonSchemas.pagination.extend({
   type: z.nativeEnum(ResourceType).optional(),
   category: z.string().optional(),

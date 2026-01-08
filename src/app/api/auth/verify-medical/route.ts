@@ -11,6 +11,9 @@ import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
+// 强制动态渲染，因为使用了 request.headers
+export const dynamic = 'force-dynamic';
+
 const verifyMedicalSchema = z.object({
   hospital: z.string().min(1, '医院不能为空'),
   department: z.string().min(1, '科室不能为空'),

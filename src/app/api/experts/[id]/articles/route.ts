@@ -11,6 +11,9 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 
+// 强制动态渲染，因为使用了 request.url
+export const dynamic = 'force-dynamic';
+
 const expertIdSchema = z.object({
   id: z.string().min(1),
 });

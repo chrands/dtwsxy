@@ -11,6 +11,9 @@ import { AppError } from '@/lib/errors';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 
+// 强制动态渲染，因为使用了 request.headers
+export const dynamic = 'force-dynamic';
+
 const courseIdSchema = z.object({
   id: z.string().min(1),
 });
