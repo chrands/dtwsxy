@@ -39,7 +39,7 @@ export interface QueryDoctorsParams {
 export interface DoctorDetail extends Doctor {
   user: {
     id: string;
-    email: string;
+    email: string | null;
     nickname: string;
     avatar: string | null;
   };

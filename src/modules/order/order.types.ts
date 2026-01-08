@@ -28,6 +28,6 @@ export interface OrderDetail extends Order {
   user: {
     id: string;
     nickname: string;
-    email: string;
+    email: string | null;
   };
 }
