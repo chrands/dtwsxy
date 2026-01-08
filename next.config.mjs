@@ -7,6 +7,9 @@ const nextConfig = {
   // 生产环境优化
   swcMinify: true,
   
+  // 注意：standalone模式会改变静态资源路径，PM2部署时不需要
+  // output: 'standalone',  // 已注释，使用默认模式
+  
   // 环境变量配置
   env: {
     CUSTOM_ENV: process.env.NODE_ENV,
@@ -36,6 +39,13 @@ const nextConfig = {
             key: 'Access-Control-Allow-Headers', 
             value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization' 
           },
+        ],
+      },
+      // 确保静态资源正确加载
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
         ],
       },
     ];

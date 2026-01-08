@@ -75,11 +75,12 @@ export const config = {
   matcher: [
     /*
      * 匹配所有路径除了:
-     * - _next/static (静态文件)
+     * - _next/static (静态文件，包括CSS)
      * - _next/image (图片优化)
      * - favicon.ico (网站图标)
      * - public文件夹中的文件
+     * - 所有静态资源文件
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|_next/webpack|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|css|js|woff|woff2|ttf|eot)$).*)',
   ],
 };
